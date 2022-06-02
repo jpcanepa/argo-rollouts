@@ -9,10 +9,14 @@ import (
 )
 
 func NewCmdDashboard(o *options.ArgoRolloutsOptions) *cobra.Command {
+	var (
+		port int = 3100
+	)
 	var cmd = &cobra.Command{
 		Use:   "dashboard",
 		Short: "Start UI dashboard",
 		RunE: func(c *cobra.Command, args []string) error {
+
 			namespace := o.Namespace()
 			kubeclientset := o.KubeClientset()
 			rolloutclientset := o.RolloutsClientset()
@@ -28,11 +32,13 @@ func NewCmdDashboard(o *options.ArgoRolloutsOptions) *cobra.Command {
 				ctx := context.Background()
 				ctx, cancel := context.WithCancel(ctx)
 				argorollouts := server.NewServer(opts)
-				argorollouts.Run(ctx, 3100, true)
+				argorollouts.Run(ctx, port, true)
 				cancel()
 			}
 		},
 	}
+
+	cmd.Flags().IntVarP(&port, "port", "p", 3100, "The port at which the dashboard is served")
 
 	return cmd
 }
